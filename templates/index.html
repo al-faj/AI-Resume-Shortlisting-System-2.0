@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>AI Resume Shortlisting System</title>
+
+  <!-- Premium Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      background: #0b1f33;
+      color: #ffffff;
+      width: 92%;
+      max-width: 950px;
+      padding: 35px 45px;
+      border-radius: 18px;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4);
+    }
+
+    h1 {
+      text-align: center;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #bcd4e6;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    label {
+      font-weight: 500;
+      color: #e0f2ff;
+    }
+
+    textarea {
+      width: 100%;
+      height: 130px;
+      margin-top: 8px;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      outline: none;
+      resize: none;
+      background: #112f4e;
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
+    }
+
+    textarea::placeholder {
+      color: #9fbcd6;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .upload-btn {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 10px 24px;
+      background: #1e88e5;
+      color: #fff;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: 0.3s;
+    }
+
+    .upload-btn:hover {
+      background: #1565c0;
+    }
+
+    .file-list {
+      margin-top: 12px;
+      font-size: 13px;
+      color: #cfe7ff;
+    }
+
+    .file-item {
+      background: #112f4e;
+      padding: 6px 12px;
+      border-radius: 15px;
+      display: inline-block;
+      margin: 5px 6px 0 0;
+    }
+
+    .main-btn {
+      display: block;
+      margin: 30px auto 10px;
+      padding: 13px 38px;
+      background: linear-gradient(135deg, #42a5f5, #1e88e5);
+      color: #fff;
+      border: none;
+      border-radius: 35px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    .main-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(66, 165, 245, 0.6);
+    }
+
+    .clear-btn {
+      display: block;
+      margin: 10px auto;
+      padding: 8px 22px;
+      background: #455a64;
+      color: #fff;
+      border: none;
+      border-radius: 20px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .clear-btn:hover {
+      background: #37474f;
+    }
+
+    .score-box {
+      text-align: center;
+      font-size: 22px;
+      font-weight: 600;
+      color: #4caf50;
+      margin-top: 12px;
+    }
+
+    h2 {
+      margin-top: 45px;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 22px;
+    }
+
+    th,
+    td {
+      padding: 14px;
+      text-align: center;
+    }
+
+    th {
+      background: #1e88e5;
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background: #112f4e;
+    }
+
+    tr:nth-child(odd) {
+      background: #0b223a;
+    }
+
+    .delete-btn {
+      padding: 6px 18px;
+      background: #e53935;
+      color: #fff;
+      border-radius: 20px;
+      text-decoration: none;
+      font-size: 13px;
+      transition: 0.3s;
+      border: none;
+      cursor: pointer;
+    }
+
+    .delete-btn:hover {
+      background: #c62828;
+    }
+
+    .empty {
+      text-align: center;
+      color: #b0cde8;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <h1>AI Resume Shortlisting System</h1>
+    <p class="subtitle">Machine Learning Based Resume Analyzer</p>
+
+    <form method="POST" enctype="multipart/form-data">
+
+      <label>Job Description</label>
+      <textarea id="jobDesc" name="job_description" placeholder="Paste job description here..." required></textarea>
+
+      <br>
+
+      <label class="upload-btn">
+        Upload Resume(s)
+        <input type="file" id="resumeInput" name="resume" multiple required>
+      </label>
+
+      <div class="file-list" id="fileList"></div>
+
+      <button type="submit" class="main-btn">Analyze Resume</button>
+      <button type="button" class="clear-btn" onclick="clearJD()">Clear Job Description</button>
+    </form>
+
+    {% if score is not none %}
+    <div class="score-box">
+      Resume Match Score: {{ score }}%
+    </div>
+    {% endif %}
+
+    <h2>Top 5 Shortlisted Resumes</h2>
+
+    {% if resumes %}
+    <table>
+      <tr>
+        <th>Rank</th>
+        <th>Resume Name</th>
+        <th>Score (%)</th>
+        <th>Action</th>
+      </tr>
+
+      {% for r in resumes %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ r.filename }}</td>
+        <td>{{ r.score }}</td>
+        <td>
+          <!-- 🔥 ONLY FIX: GET → POST (UI SAME) -->
+          <form action="/delete/{{ r.id }}" method="post" style="display:inline;">
+            <button type="submit" class="delete-btn">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% else %}
+    <p class="empty">No resumes analyzed yet.</p>
+    {% endif %}
+
+  </div>
+
+  <script>
+    const jobDesc = document.getElementById("jobDesc");
+    const resumeInput = document.getElementById("resumeInput");
+    const fileList = document.getElementById("fileList");
+
+    window.onload = function () {
+      const savedJD = localStorage.getItem("job_description");
+      if (savedJD) {
+        jobDesc.value = savedJD;
+      }
+    };
+
+    jobDesc.addEventListener("input", function () {
+      localStorage.setItem("job_description", jobDesc.value);
+    });
+
+    function clearJD() {
+      localStorage.removeItem("job_description");
+      jobDesc.value = "";
+    }
+
+    resumeInput.addEventListener("change", function () {
+      fileList.innerHTML = "";
+      for (let i = 0; i < resumeInput.files.length; i++) {
+        const span = document.createElement("span");
+        span.className = "file-item";
+        span.innerText = resumeInput.files[i].name;
+        fileList.appendChild(span);
+      }
+    });
+  </script>
+
+</body>
+
+</html>
