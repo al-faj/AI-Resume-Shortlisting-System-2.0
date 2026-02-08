@@ -1,1 +1,6 @@
+Flask
+scikit-learn
+nltk
+PyPDF2
+gunicorn
 
